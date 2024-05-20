@@ -1,5 +1,5 @@
 {
-    "name": "yzh52521/think-filesystem",
+    "name": "bingher/think-filesystem",
     "description": "thinkphp6.1 for filesystem,include Aliyun and Qiniu COS OBS ",
     "type": "library",
     "require": {
@@ -31,13 +31,13 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "yzh52521\\filesystem\\": "src/"
+            "bingher\\filesystem\\": "src/"
         }
     },
     "extra": {
         "think": {
             "services": [
-                "yzh52521\\filesystem\\Service"
+                "bingher\\filesystem\\Service"
             ]
         }
     }
