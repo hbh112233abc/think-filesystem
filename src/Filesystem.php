@@ -101,9 +101,9 @@ class Filesystem extends Manager
     /**
      * 获取磁盘配置
      * @param string $disk
-     * @param null $name
-     * @param null $default
-     * @return array
+     * @param null|string $name
+     * @param mixed $default
+     * @return mixed
      */
     public function getDiskConfig($disk,$name = null,$default = null)
     {
