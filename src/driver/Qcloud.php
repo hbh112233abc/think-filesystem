@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace yzh52521\filesystem\driver;
+namespace bingher\filesystem\driver;
 
 use Overtrue\Flysystem\Cos\CosAdapter;
-use yzh52521\filesystem\Driver;
+use bingher\filesystem\Driver;
 
 class Qcloud extends Driver
 {
 
     protected function createAdapter()
     {
-        return new CosAdapter( $this->config );
+        return new CosAdapter($this->config);
     }
 }

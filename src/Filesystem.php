@@ -1,8 +1,8 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
-namespace yzh52521\filesystem;
+namespace bingher\filesystem;
 
 use InvalidArgumentException;
 use think\helper\Arr;
@@ -18,7 +18,7 @@ class Filesystem extends Manager
      */
     protected $customCreators = [];
 
-    protected $namespace = '\\yzh52521\\filesystem\\driver\\';
+    protected $namespace = '\\bingher\\filesystem\\driver\\';
 
     /**
      * @param null|string $name
@@ -26,7 +26,7 @@ class Filesystem extends Manager
      */
     public function disk(string $name = null): Driver
     {
-        return $this->driver( $name );
+        return $this->driver($name);
     }
 
     /**
@@ -35,7 +35,7 @@ class Filesystem extends Manager
      */
     public function cloud(string $name = null): Driver
     {
-        return $this->driver( $name );
+        return $this->driver($name);
     }
 
     /**
@@ -46,40 +46,40 @@ class Filesystem extends Manager
      */
     protected function callCustomCreator(array $config)
     {
-        return $this->customCreators[$config['driver']]( $this->app,$config );
+        return $this->customCreators[$config['driver']]($this->app, $config);
     }
 
     protected function resolveType(string $name)
     {
-        return $this->getDiskConfig( $name,'type','local' );
+        return $this->getDiskConfig($name, 'type', 'local');
     }
 
     protected function resolveConfig(string $name)
     {
-        return $this->getDiskConfig( $name );
+        return $this->getDiskConfig($name);
     }
 
     protected function createDriver(string $name)
     {
-        $type = $this->resolveType( $name );
+        $type = $this->resolveType($name);
 
 
-        if (isset( $this->customCreators[$name] )) {
-            return $this->callCustomCreator( $type );
+        if (isset($this->customCreators[$name])) {
+            return $this->callCustomCreator($type);
         }
 
-        $method = 'create'.Str::studly( $type ).'Driver';
+        $method = 'create' . Str::studly($type) . 'Driver';
 
-        $params = $this->resolveParams( $name );
+        $params = $this->resolveParams($name);
 
 
-        if (method_exists( $this,$method )) {
-            return $this->$method( ...$params );
+        if (method_exists($this, $method)) {
+            return $this->$method(...$params);
         }
 
-        $class = $this->resolveClass( $type );
+        $class = $this->resolveClass($type);
 
-        return $this->app->invokeClass( $class,$params );
+        return $this->app->invokeClass($class, $params);
     }
 
     /**
@@ -89,13 +89,13 @@ class Filesystem extends Manager
      * @param mixed $default 默认值
      * @return mixed
      */
-    public function getConfig(string $name = null,$default = null)
+    public function getConfig(string $name = null, $default = null)
     {
-        if (!is_null( $name )) {
-            return $this->app->config->get( 'filesystem.'.$name,$default );
+        if (!is_null($name)) {
+            return $this->app->config->get('filesystem.' . $name, $default);
         }
 
-        return $this->app->config->get( 'filesystem' );
+        return $this->app->config->get('filesystem');
     }
 
     /**
@@ -105,13 +105,13 @@ class Filesystem extends Manager
      * @param null $default
      * @return array
      */
-    public function getDiskConfig($disk,$name = null,$default = null)
+    public function getDiskConfig($disk, $name = null, $default = null)
     {
-        if ($config = $this->getConfig( "disks.{$disk}" )) {
-            return Arr::get( $config,$name,$default );
+        if ($config = $this->getConfig("disks.{$disk}")) {
+            return Arr::get($config, $name, $default);
         }
 
-        throw new InvalidArgumentException( "Disk [$disk] not found." );
+        throw new InvalidArgumentException("Disk [$disk] not found.");
     }
 
     /**
@@ -120,7 +120,7 @@ class Filesystem extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->getConfig( 'default' );
+        return $this->getConfig('default');
     }
 
     /**
@@ -128,7 +128,7 @@ class Filesystem extends Manager
      * @param \Closure $callback
      * @return $this
      */
-    public function extend($driver,\Closure $callback)
+    public function extend($driver, \Closure $callback)
     {
         $this->customCreators[$driver] = $callback;
 
@@ -141,8 +141,8 @@ class Filesystem extends Manager
      * @param array $parameters
      * @return mixed
      */
-    public function __call($method,$parameters)
+    public function __call($method, $parameters)
     {
-        return $this->driver()->$method( ...$parameters );
+        return $this->driver()->$method(...$parameters);
     }
 }

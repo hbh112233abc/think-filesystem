@@ -1,13 +1,13 @@
 <?php
 
-declare( strict_types = 1 );
+declare(strict_types=1);
 
-namespace yzh52521\filesystem\driver;
+namespace bingher\filesystem\driver;
 
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
-use yzh52521\filesystem\Driver;
+use bingher\filesystem\Driver;
 
 class Local extends Driver
 {
@@ -27,7 +27,7 @@ class Local extends Driver
             $this->config['visibility'] ?? Visibility::PRIVATE
         );
 
-        $links = ( $this->config['links'] ?? null ) === 'skip'
+        $links = ($this->config['links'] ?? null) === 'skip'
             ? LocalFilesystemAdapter::SKIP_LINKS
             : LocalFilesystemAdapter::DISALLOW_LINKS;
 

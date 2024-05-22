@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace yzh52521\filesystem;
+namespace bingher\filesystem;
 
 class Service extends \think\Service
 {

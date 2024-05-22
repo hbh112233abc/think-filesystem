@@ -2,7 +2,7 @@
 
 declare ( strict_types = 1 );
 
-namespace yzh52521\filesystem;
+namespace bingher\filesystem;
 
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemAdapter;
@@ -34,7 +34,7 @@ use voku\helper\ASCII;
 
 /**
  * Class Driver
- * @package yzh52521\filesystem
+ * @package bingher\filesystem
  * @mixin Filesystem
  */
 abstract class Driver

@@ -1,16 +1,16 @@
 <?php
 
-declare ( strict_types = 1 );
+declare(strict_types=1);
 
-namespace yzh52521\filesystem\facade;
+namespace bingher\filesystem\facade;
 
 use think\Facade;
-use yzh52521\filesystem\Driver;
+use bingher\filesystem\Driver;
 
 /**
  * Class Filesystem
  * @package think\facade
- * @mixin \yzh52521\filesystem\Filesystem
+ * @mixin \bingher\filesystem\Filesystem
  * @method static Driver disk( string $name = null ) ,null|string
  * @method static Driver cloud( string $name = null ) ,null|string
  * @method static mixed getConfig( null|string $name = null,mixed $default = null ) 获取缓存配置

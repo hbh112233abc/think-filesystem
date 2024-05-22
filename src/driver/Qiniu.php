@@ -1,11 +1,11 @@
 <?php
-declare( strict_types = 1 );
+declare(strict_types=1);
 
-namespace yzh52521\filesystem\driver;
+namespace bingher\filesystem\driver;
 
 
 use Overtrue\Flysystem\Qiniu\QiniuAdapter;
-use yzh52521\filesystem\Driver;
+use bingher\filesystem\Driver;
 
 class Qiniu extends Driver
 {
@@ -13,8 +13,10 @@ class Qiniu extends Driver
     protected function createAdapter()
     {
         return new QiniuAdapter(
-            $this->config['access_key'], $this->config['secret_key'],
-            $this->config['bucket'], $this->config['domain']
+            $this->config['access_key'],
+            $this->config['secret_key'],
+            $this->config['bucket'],
+            $this->config['domain']
         );
     }
 }

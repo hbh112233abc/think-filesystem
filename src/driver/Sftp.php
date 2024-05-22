@@ -1,12 +1,12 @@
 <?php
-declare( strict_types = 1 );
+declare(strict_types=1);
 
-namespace yzh52521\filesystem\driver;
+namespace bingher\filesystem\driver;
 
 use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
-use yzh52521\filesystem\Driver;
+use bingher\filesystem\Driver;
 
 class Sftp extends Driver
 {
@@ -19,6 +19,6 @@ class Sftp extends Driver
         $visibility = PortableVisibilityConverter::fromArray(
             $this->config['permissions'] ?? []
         );
-        return new SftpAdapter( $provider,$root,$visibility );
+        return new SftpAdapter($provider, $root, $visibility);
     }
 }
