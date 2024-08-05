@@ -1,6 +1,6 @@
 <?php
 
-declare ( strict_types = 1 );
+declare(strict_types=1);
 
 namespace bingher\filesystem;
 
@@ -62,20 +62,20 @@ abstract class Driver
      */
     protected $config = [];
 
-    public function __construct(Cache $cache,array $config)
+    public function __construct(Cache $cache, array $config)
     {
         $this->cache  = $cache;
-        $this->config = array_merge( $this->config,$config );
+        $this->config = array_merge($this->config, $config);
 
         $separator      = $config['directory_separator'] ?? DIRECTORY_SEPARATOR;
-        $this->prefixer = new PathPrefixer( $config['root'] ?? '',$separator );
+        $this->prefixer = new PathPrefixer($config['root'] ?? '', $separator);
 
-        if (isset( $config['prefix'] )) {
-            $this->prefixer = new PathPrefixer( $this->prefixer->prefixPath( $config['prefix'] ),$separator );
+        if (isset($config['prefix'])) {
+            $this->prefixer = new PathPrefixer($this->prefixer->prefixPath($config['prefix']), $separator);
         }
 
-        $this->adapter          = $this->createAdapter();
-        $this->filesystem = $this->createFilesystem( $this->adapter,$this->config );
+        $this->adapter    = $this->createAdapter();
+        $this->filesystem = $this->createFilesystem($this->adapter, $this->config);
     }
 
     abstract protected function createAdapter();
@@ -85,23 +85,23 @@ abstract class Driver
      * @param array $config
      * @return Filesystem
      */
-    protected function createFilesystem(FilesystemAdapter $adapter,array $config)
+    protected function createFilesystem(FilesystemAdapter $adapter, array $config)
     {
         if ($config['read-only'] ?? false === true) {
             $adapter = new ReadOnlyFilesystemAdapter($adapter);
         }
 
-        if (! empty($config['prefix'])) {
+        if (!empty($config['prefix'])) {
             $adapter = new PathPrefixedAdapter($adapter, $config['prefix']);
         }
 
-        return new Filesystem( $adapter,Arr::only( $config,[
+        return new Filesystem($adapter, Arr::only($config, [
             'directory_visibility',
             'disable_asserts',
             'temporary_url',
             'url',
             'visibility',
-        ] ) );
+        ]));
     }
 
     /**
@@ -111,12 +111,12 @@ abstract class Driver
      */
     public function path(string $path): string
     {
-        return $this->prefixer->prefixPath( $path );
+        return $this->prefixer->prefixPath($path);
     }
 
-    protected function concatPathToUrl($url,$path)
+    protected function concatPathToUrl($url, $path)
     {
-        return rtrim( $url,'/' ).'/'.ltrim( $path,'/' );
+        return rtrim($url, '/') . '/' . ltrim($path, '/');
     }
 
     /**
@@ -127,7 +127,7 @@ abstract class Driver
      */
     public function exists($path): bool
     {
-        return $this->filesystem->has( $path );
+        return $this->filesystem->has($path);
     }
 
     /**
@@ -138,7 +138,7 @@ abstract class Driver
      */
     public function missing($path): bool
     {
-        return !$this->exists( $path );
+        return !$this->exists($path);
     }
 
     /**
@@ -149,7 +149,7 @@ abstract class Driver
      */
     public function fileExists($path): bool
     {
-        return $this->filesystem->fileExists( $path );
+        return $this->filesystem->fileExists($path);
     }
 
     /**
@@ -160,7 +160,7 @@ abstract class Driver
      */
     public function fileMissing($path): bool
     {
-        return !$this->fileExists( $path );
+        return !$this->fileExists($path);
     }
 
     /**
@@ -171,7 +171,7 @@ abstract class Driver
      */
     public function directoryExists($path)
     {
-        return $this->filesystem->directoryExists( $path );
+        return $this->filesystem->directoryExists($path);
     }
 
     /**
@@ -182,7 +182,7 @@ abstract class Driver
      */
     public function directoryMissing($path)
     {
-        return !$this->directoryExists( $path );
+        return !$this->directoryExists($path);
     }
 
     /**
@@ -194,9 +194,9 @@ abstract class Driver
     public function get($path)
     {
         try {
-            return $this->filesystem->read( $path );
-        } catch ( UnableToReadFile $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            return $this->filesystem->read($path);
+        } catch (UnableToReadFile $e) {
+            throw_if($this->throwsExceptions(), $e);
         }
     }
 
@@ -209,35 +209,37 @@ abstract class Driver
      * @param string|null $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function response($path,$name = null,array $headers = [],$disposition = 'inline')
+    public function response($path, $name = null, array $headers = [], $disposition = 'inline')
     {
         $response = new StreamedResponse;
 
-        if (!array_key_exists( 'Content-Type',$headers )) {
-            $headers['Content-Type'] = $this->mimeType( $path );
+        if (!array_key_exists('Content-Type', $headers)) {
+            $headers['Content-Type'] = $this->mimeType($path);
         }
 
-        if (!array_key_exists( 'Content-Length',$headers )) {
-            $headers['Content-Length'] = $this->size( $path );
+        if (!array_key_exists('Content-Length', $headers)) {
+            $headers['Content-Length'] = $this->size($path);
         }
 
-        if (!array_key_exists( 'Content-Disposition',$headers )) {
-            $filename = $name ?? basename( $path );
+        if (!array_key_exists('Content-Disposition', $headers)) {
+            $filename = $name ?? basename($path);
 
             $disposition = $response->headers->makeDisposition(
-                $disposition,$filename,$this->fallbackName( $filename )
+                $disposition,
+                $filename,
+                $this->fallbackName($filename)
             );
 
             $headers['Content-Disposition'] = $disposition;
         }
 
-        $response->headers->replace( $headers );
+        $response->headers->replace($headers);
 
-        $response->setCallback( function () use ($path) {
-            $stream = $this->readStream( $path );
-            fpassthru( $stream );
-            fclose( $stream );
-        } );
+        $response->setCallback(function () use ($path) {
+            $stream = $this->readStream($path);
+            fpassthru($stream);
+            fclose($stream);
+        });
 
         return $response;
     }
@@ -249,9 +251,9 @@ abstract class Driver
      * @param string|null $name
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function download($path,$name = null,array $headers = [])
+    public function download($path, $name = null, array $headers = [])
     {
-        return $this->response( $path,$name,$headers,'attachment' );
+        return $this->response($path, $name, $headers, 'attachment');
     }
 
     /**
@@ -262,7 +264,7 @@ abstract class Driver
      */
     protected function fallbackName($name)
     {
-        return str_replace( '%','',ASCII::to_ascii( $name,'en' ) );
+        return str_replace('%', '', ASCII::to_ascii($name, 'en'));
     }
     /**
      * Get the visibility for the given path.
@@ -272,7 +274,7 @@ abstract class Driver
      */
     public function getVisibility($path)
     {
-        if ($this->filesystem->visibility( $path ) == Visibility::PUBLIC) {
+        if ($this->filesystem->visibility($path) == Visibility::PUBLIC ) {
             return 'public';
         }
 
@@ -286,12 +288,12 @@ abstract class Driver
      * @param string $visibility
      * @return bool
      */
-    public function setVisibility($path,$visibility)
+    public function setVisibility($path, $visibility)
     {
         try {
-            $this->filesystem->setVisibility( $path,$visibility );
-        } catch ( UnableToSetVisibility $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            $this->filesystem->setVisibility($path, $visibility);
+        } catch (UnableToSetVisibility $e) {
+            throw_if($this->throwsExceptions(), $e);
 
             return false;
         }
@@ -307,13 +309,13 @@ abstract class Driver
      * @param string $separator
      * @return bool
      */
-    public function prepend($path,$data,$separator = PHP_EOL)
+    public function prepend($path, $data, $separator = PHP_EOL)
     {
-        if ($this->fileExists( $path )) {
-            return $this->put( $path,$data.$separator.$this->get( $path ) );
+        if ($this->fileExists($path)) {
+            return $this->put($path, $data . $separator . $this->get($path));
         }
 
-        return $this->put( $path,$data );
+        return $this->put($path, $data);
     }
 
     /**
@@ -324,13 +326,13 @@ abstract class Driver
      * @param string $separator
      * @return bool
      */
-    public function append($path,$data,$separator = PHP_EOL)
+    public function append($path, $data, $separator = PHP_EOL)
     {
-        if ($this->fileExists( $path )) {
-            return $this->put( $path,$this->get( $path ).$separator.$data );
+        if ($this->fileExists($path)) {
+            return $this->put($path, $this->get($path) . $separator . $data);
         }
 
-        return $this->put( $path,$data );
+        return $this->put($path, $data);
     }
 
 
@@ -342,15 +344,15 @@ abstract class Driver
      */
     public function delete($paths)
     {
-        $paths = is_array( $paths ) ? $paths : func_get_args();
+        $paths = is_array($paths) ? $paths : func_get_args();
 
         $success = true;
 
-        foreach ( $paths as $path ) {
+        foreach ($paths as $path) {
             try {
-                $this->filesystem->delete( $path );
-            } catch ( UnableToDeleteFile $e ) {
-                throw_if( $this->throwsExceptions(),$e );
+                $this->filesystem->delete($path);
+            } catch (UnableToDeleteFile $e) {
+                throw_if($this->throwsExceptions(), $e);
 
                 $success = false;
             }
@@ -366,12 +368,12 @@ abstract class Driver
      * @param string $to
      * @return bool
      */
-    public function copy($from,$to)
+    public function copy($from, $to)
     {
         try {
-            $this->filesystem->copy( $from,$to );
-        } catch ( UnableToCopyFile $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            $this->filesystem->copy($from, $to);
+        } catch (UnableToCopyFile $e) {
+            throw_if($this->throwsExceptions(), $e);
 
             return false;
         }
@@ -386,12 +388,12 @@ abstract class Driver
      * @param string $to
      * @return bool
      */
-    public function move($from,$to)
+    public function move($from, $to)
     {
         try {
-            $this->filesystem->move( $from,$to );
-        } catch ( UnableToMoveFile $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            $this->filesystem->move($from, $to);
+        } catch (UnableToMoveFile $e) {
+            throw_if($this->throwsExceptions(), $e);
 
             return false;
         }
@@ -408,7 +410,7 @@ abstract class Driver
      */
     public function size($path)
     {
-        return $this->filesystem->fileSize( $path );
+        return $this->filesystem->fileSize($path);
     }
 
     /**
@@ -420,9 +422,9 @@ abstract class Driver
     public function mimeType($path)
     {
         try {
-            return $this->filesystem->mimeType( $path );
-        } catch ( UnableToRetrieveMetadata $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            return $this->filesystem->mimeType($path);
+        } catch (UnableToRetrieveMetadata $e) {
+            throw_if($this->throwsExceptions(), $e);
         }
 
         return false;
@@ -436,7 +438,7 @@ abstract class Driver
      */
     public function lastModified($path): int
     {
-        return $this->filesystem->lastModified( $path );
+        return $this->filesystem->lastModified($path);
     }
 
 
@@ -446,21 +448,21 @@ abstract class Driver
     public function readStream($path)
     {
         try {
-            return $this->filesystem->readStream( $path );
-        } catch ( UnableToReadFile $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            return $this->filesystem->readStream($path);
+        } catch (UnableToReadFile $e) {
+            throw_if($this->throwsExceptions(), $e);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function writeStream($path,$resource,array $options = [])
+    public function writeStream($path, $resource, array $options = [])
     {
         try {
-            $this->filesystem->writeStream( $path,$resource,$options );
-        } catch ( UnableToWriteFile|UnableToSetVisibility $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            $this->filesystem->writeStream($path, $resource, $options);
+        } catch (UnableToWriteFile | UnableToSetVisibility $e) {
+            throw_if($this->throwsExceptions(), $e);
 
             return false;
         }
@@ -470,8 +472,8 @@ abstract class Driver
 
     protected function getLocalUrl($path)
     {
-        if (isset( $this->config['url'] )) {
-            return $this->concatPathToUrl( $this->config['url'],$path );
+        if (isset($this->config['url'])) {
+            return $this->concatPathToUrl($this->config['url'], $path);
         }
 
         return $path;
@@ -481,16 +483,18 @@ abstract class Driver
     {
         $adapter = $this->adapter;
 
-        if (method_exists( $adapter,'getUrl' )) {
-            return $adapter->getUrl( $path );
-        } elseif (method_exists( $this->filesystem,'getUrl' )) {
-            return $this->filesystem->getUrl( $path );
+        if (method_exists($adapter, 'getUrl')) {
+            return $adapter->getUrl($path);
+        } elseif (method_exists($this->filesystem, 'getUrl')) {
+            return $this->filesystem->getUrl($path);
         } elseif ($adapter instanceof SftpAdapter || $adapter instanceof FtpAdapter) {
-            return $this->getFtpUrl( $path );
+            return $this->getFtpUrl($path);
         } elseif ($adapter instanceof LocalFilesystemAdapter) {
-            return $this->getLocalUrl( $path );
+            return $this->getLocalUrl($path);
+        } elseif (method_exists($this, 'getUrl')) {
+            return $this->getUrl($path);
         } else {
-            throw new \RuntimeException( 'This driver does not support retrieving URLs.' );
+            throw new \RuntimeException('This driver does not support retrieving URLs.');
         }
     }
 
@@ -503,8 +507,8 @@ abstract class Driver
      */
     protected function getFtpUrl($path)
     {
-        return isset( $this->config['url'] )
-            ? $this->concatPathToUrl( $this->config['url'],$path )
+        return isset($this->config['url'])
+            ? $this->concatPathToUrl($this->config['url'], $path)
             : $path;
     }
 
@@ -515,14 +519,14 @@ abstract class Driver
      * @param string $url
      * @return \Psr\Http\Message\UriInterface
      */
-    protected function replaceBaseUrl($uri,$url)
+    protected function replaceBaseUrl($uri, $url)
     {
-        $parsed = parse_url( $url );
+        $parsed = parse_url($url);
 
         return $uri
-            ->withScheme( $parsed['scheme'] )
-            ->withHost( $parsed['host'] )
-            ->withPort( $parsed['port'] ?? null );
+            ->withScheme($parsed['scheme'])
+            ->withHost($parsed['host'])
+            ->withPort($parsed['port'] ?? null);
     }
 
     /**
@@ -553,10 +557,10 @@ abstract class Driver
      * @param array $options 参数
      * @return bool|string
      */
-    public function putFile(string $path,$file,$rule = null,array $options = [])
+    public function putFile(string $path, $file, $rule = null, array $options = [])
     {
-        $file = is_string( $file ) ? new File( $file ) : $file;
-        return $this->putFileAs( $path,$file,$file->hashName( $rule ),$options );
+        $file = is_string($file) ? new File($file) : $file;
+        return $this->putFileAs($path, $file, $file->hashName($rule), $options);
     }
 
     /**
@@ -567,46 +571,48 @@ abstract class Driver
      * @param array $options 参数
      * @return bool|string
      */
-    public function putFileAs(string $path,File $file,string $name,array $options = [])
+    public function putFileAs(string $path, File $file, string $name, array $options = [])
     {
-        $stream = fopen( $file->getRealPath(),'r' );
-        $path   = trim( $path.'/'.$name,'/' );
+        $stream = fopen($file->getRealPath(), 'r');
+        $path   = trim($path . '/' . $name, '/');
 
-        $result = $this->put( $path,$stream,$options );
+        $result = $this->put($path, $stream, $options);
 
-        if (is_resource( $stream )) {
-            fclose( $stream );
+        if (is_resource($stream)) {
+            fclose($stream);
         }
 
         return $result ? $path : false;
     }
 
-    public function put($path,$contents,$options = [])
+    public function put($path, $contents, $options = [])
     {
-        $options = is_string( $options )
+        $options = is_string($options)
             ? ['visibility' => $options]
-            : (array)$options;
+            : (array) $options;
 
         // If the given contents is actually a file or uploaded file instance than we will
         // automatically store the file using a stream. This provides a convenient path
         // for the developer to store streams without managing them manually in code.
-        if ($contents instanceof File ||
-            $contents instanceof UploadedFile) {
-            return $this->putFile( $path,$contents,$options );
+        if (
+            $contents instanceof File ||
+            $contents instanceof UploadedFile
+        ) {
+            return $this->putFile($path, $contents, $options);
         }
 
         try {
             if ($contents instanceof StreamInterface) {
-                $this->writeStream( $path,$contents->detach(),$options );
+                $this->writeStream($path, $contents->detach(), $options);
 
                 return true;
             }
 
-            is_resource( $contents )
-                ? $this->writeStream( $path,$contents,$options )
-                : $this->write( $path,$contents,$options );
-        } catch ( UnableToWriteFile|UnableToSetVisibility $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            is_resource($contents)
+                ? $this->writeStream($path, $contents, $options)
+                : $this->write($path, $contents, $options);
+        } catch (UnableToWriteFile | UnableToSetVisibility $e) {
+            throw_if($this->throwsExceptions(), $e);
 
             return false;
         }
@@ -621,16 +627,16 @@ abstract class Driver
      * @param bool $recursive
      * @return array
      */
-    public function files($directory = null,$recursive = false)
+    public function files($directory = null, $recursive = false)
     {
-        return $this->filesystem->listContents( $directory ?? '',$recursive )
-            ->filter( function (StorageAttributes $attributes) {
+        return $this->filesystem->listContents($directory ?? '', $recursive)
+            ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isFile();
-            } )
+            })
             ->sortByPath()
-            ->map( function (StorageAttributes $attributes) {
+            ->map(function (StorageAttributes $attributes) {
                 return $attributes->path();
-            } )
+            })
             ->toArray();
     }
 
@@ -642,7 +648,7 @@ abstract class Driver
      */
     public function allFiles($directory = null)
     {
-        return $this->files( $directory,true );
+        return $this->files($directory, true);
     }
 
     /**
@@ -652,15 +658,15 @@ abstract class Driver
      * @param bool $recursive
      * @return array
      */
-    public function directories($directory = null,$recursive = false)
+    public function directories($directory = null, $recursive = false)
     {
-        return $this->filesystem->listContents( $directory ?? '',$recursive )
-            ->filter( function (StorageAttributes $attributes) {
+        return $this->filesystem->listContents($directory ?? '', $recursive)
+            ->filter(function (StorageAttributes $attributes) {
                 return $attributes->isDir();
-            } )
-            ->map( function (StorageAttributes $attributes) {
+            })
+            ->map(function (StorageAttributes $attributes) {
                 return $attributes->path();
-            } )
+            })
             ->toArray();
     }
 
@@ -672,7 +678,7 @@ abstract class Driver
      */
     public function allDirectories($directory = null)
     {
-        return $this->directories( $directory,true );
+        return $this->directories($directory, true);
     }
 
     /**
@@ -684,9 +690,9 @@ abstract class Driver
     public function makeDirectory($path)
     {
         try {
-            $this->filesystem->createDirectory( $path );
-        } catch ( UnableToCreateDirectory|UnableToSetVisibility $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            $this->filesystem->createDirectory($path);
+        } catch (UnableToCreateDirectory | UnableToSetVisibility $e) {
+            throw_if($this->throwsExceptions(), $e);
 
             return false;
         }
@@ -703,9 +709,9 @@ abstract class Driver
     public function deleteDirectory($directory)
     {
         try {
-            $this->filesystem->deleteDirectory( $directory );
-        } catch ( UnableToDeleteDirectory $e ) {
-            throw_if( $this->throwsExceptions(),$e );
+            $this->filesystem->deleteDirectory($directory);
+        } catch (UnableToDeleteDirectory $e) {
+            throw_if($this->throwsExceptions(), $e);
 
             return false;
         }
@@ -720,11 +726,11 @@ abstract class Driver
      */
     protected function throwsExceptions(): bool
     {
-        return (bool)( $this->config['throw'] ?? false );
+        return (bool) ($this->config['throw'] ?? false);
     }
 
-    public function __call($method,$parameters)
+    public function __call($method, $parameters)
     {
-        return $this->filesystem->$method( ...$parameters );
+        return $this->filesystem->$method(...$parameters);
     }
 }

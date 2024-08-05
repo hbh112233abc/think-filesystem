@@ -36,4 +36,12 @@ class S3 extends Driver
 
         return Arr::except($config, ['token']);
     }
+
+    protected function getUrl(string $path)
+    {
+        $expireAt = new \DateTime();
+        $expireAt->add(\DateInterval::createFromDateString(($this->config['expire'] ?? 1800) . ' seconds'));
+        $options = new \League\Flysystem\Config;
+        return $this->adapter->temporaryUrl($path, $expireAt, $options);
+    }
 }
