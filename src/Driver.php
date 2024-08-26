@@ -608,9 +608,12 @@ abstract class Driver
                 return true;
             }
 
-            is_resource($contents)
+            $res = is_resource($contents)
                 ? $this->writeStream($path, $contents, $options)
                 : $this->write($path, $contents, $options);
+            if ($res === false) {
+                return false;
+            }
         } catch (UnableToWriteFile | UnableToSetVisibility $e) {
             throw_if($this->throwsExceptions(), $e);
 
