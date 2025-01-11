@@ -1,8 +1,9 @@
 <?php
-
 declare(strict_types=1);
 
 namespace bingher\filesystem\driver;
+
+putenv('AWS_SUPPRESS_PHP_DEPRECATION_WARNING=1');
 
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter;
 use League\Flysystem\Visibility;
