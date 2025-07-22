@@ -28,7 +28,7 @@
             "email": "396751927@qq.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "bingher\\filesystem\\": "src/"
