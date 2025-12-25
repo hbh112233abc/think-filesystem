@@ -10,10 +10,10 @@
         "overtrue/flysystem-qiniu": "^3.0",
         "overtrue/flysystem-cos": "^5.0.0",
         "yzh52521/flysystem-obs": "^3.0",
-        "league/flysystem-aws-s3-v3":"^3.0",
+        "league/flysystem-aws-s3-v3": "^3.0",
         "league/flysystem-sftp-v3": "^3.0",
         "league/flysystem-ftp": "^3.0",
-        "league/flysystem-google-cloud-storage":"^3.0",
+        "league/flysystem-google-cloud-storage": "^3.0",
         "voku/portable-ascii": "^1.6.1|^2.0",
         "league/flysystem-path-prefixing": "^3.3",
         "league/flysystem-read-only": "^3.3"
@@ -26,6 +26,10 @@
         {
             "name": "yzh52521",
             "email": "396751927@qq.com"
+        },
+        {
+            "name": "bingher",
+            "email": "hbh112233abc@163.com"
         }
     ],
     "minimum-stability": "stable",
